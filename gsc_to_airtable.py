@@ -38,7 +38,7 @@ TEST_MODE = False  # 🚀 Set to False when ready for Airtable upload
 BASE_URL = "https://gsc.searchatlas.com/search-console/api/v2/core-reports"
 HEADERS = {"Authorization": f"Bearer {SA_JWT}", "Content-Type": "application/json"}
 
-DOMAINS_CSV_PATH = "/Users/apple/Desktop/domains.csv"
+DOMAINS_CSV_PATH = "domains.csv"
 OUTPUT_CSV_PATH = "core_report_snapshot.csv"
 
 # ────────────── PERIOD LOGIC ──────────────
