@@ -38,7 +38,7 @@ TEST_MODE = False  # 🚀 Set to False when ready for Airtable upload
 BASE_URL = "https://gsc.searchatlas.com/search-console/api/v2/core-reports"
 HEADERS = {"Authorization": f"Bearer {SA_JWT}", "Content-Type": "application/json"}
 
-DOMAINS_CSV_PATH = "domains.csv"
+DOMAINS_CSV_PATH = "/Users/apple/Desktop/domains.csv"
 OUTPUT_CSV_PATH = "core_report_snapshot.csv"
 
 # ────────────── PERIOD LOGIC ──────────────
@@ -72,10 +72,10 @@ def fetch_core_report(selected_property: str, timeout: int = 60) -> Dict[str, An
         log.warning("Fetch failed for %s: %s", selected_property, exc)
     return {}
 
-def percent_change(old: float, new: float) -> float:
+def percent_change(old: float, new: float) -> Any:
     if old == 0:
-        return float("inf") if new > 0 else 0.0
-    return ((new - old) / old) * 100.0
+        return None if new > 0 else 0.0  # Use None for undefined (∞) cases
+    return round(((new - old) / old) * 100.0, 2)
 
 def is_non_zero(metrics: Dict[str, Any]) -> bool:
     return any(v not in (0, 0.0, None, "nan", "NaN") for v in metrics.values())
@@ -93,13 +93,13 @@ def extract_metrics(payload: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "Clicks P1": clicks_p1,
         "Clicks P2": clicks_p2,
-        "% Δ Clicks": round(percent_change(clicks_p1, clicks_p2), 2),
+        "% Δ Clicks": percent_change(clicks_p1, clicks_p2),
         "Impr P1": impr_p1,
         "Impr P2": impr_p2,
-        "% Δ Impr": round(percent_change(impr_p1, impr_p2), 2),
+        "% Δ Impr": percent_change(impr_p1, impr_p2),
         "Avg Rank P1": round(rank_p1, 2),
         "Avg Rank P2": round(rank_p2, 2),
-        "% Δ Rank": round(percent_change(rank_p1, rank_p2), 2),
+        "% Δ Rank": percent_change(rank_p1, rank_p2),
         "Improved KW": kw.get("improved_kw", 0),
         "Declined KW": kw.get("declined_kw", 0),
     }
