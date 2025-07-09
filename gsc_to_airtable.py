@@ -150,6 +150,19 @@ def upload_to_airtable(records: List[Dict[str, Any]]):
     api = Api(AIRTABLE_PAT)
     table = api.table(AIRTABLE_BASE_ID, AIRTABLE_TABLE)
     log.info("Fetching existing records for upsert …")
+
+    # Diagnostic: List current Airtable field names
+    log.info("🔎 Fetching Airtable table fields for verification…")
+    try:
+        records_sample = table.all(max_records=1)
+        if records_sample:
+            fields = records_sample[0]["fields"].keys()
+            log.info("✅ Existing fields in Airtable table: %s", list(fields))
+        else:
+            log.info("⚠️ No records found to fetch field names.")
+    except Exception as e:
+        log.error("Error fetching Airtable table fields: %s", e)
+
     existing = {}
     for row in table.all(fields=["Domain", "Period 2 Start"]):
         fields = row.get("fields", {})
@@ -178,6 +191,7 @@ def upload_to_airtable(records: List[Dict[str, Any]]):
             log.info("🆕 Created %s (%s)", domain, period2_start)
 
     log.info("✅ Airtable sync complete | Created: %d | Updated: %d", created, updated)
+
 
 # ────────────── MAIN FLOW ──────────────
 def main() -> None:
